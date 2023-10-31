@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Searchbar from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
+import { Button } from './Button/Button';
 
-
-export default class App extends Component {
+class App extends Component {
   state = {
     query: '',
     images: [],
@@ -28,6 +30,12 @@ export default class App extends Component {
       });
     }
   }
+
+  componentWillUnmount() {
+    // Cleanup or additional actions before unmounting
+    // Not needed in this example
+  }
+
   fetchImages = async () => {
     this.setState({ isLoading: true });
 
@@ -55,19 +63,41 @@ export default class App extends Component {
       this.setState({ isLoading: false });
     }
   };
+
   handleSearchSubmit = (query) => {
     this.setState({ query });
   };
-  
+
+  handleLoadMore = () => {
+    this.fetchImages();
+  };
+
+  handleOpenModal = (largeImageURL) => {
+    this.setState({ showModal: true, modalImageURL: largeImageURL });
+  };
+
+  handleCloseModal = () => {
+    this.setState({ showModal: false, modalImageURL: '' });
+  };
+
   render() {
     const { images, isLoading, showModal, modalImageURL } = this.state;
 
     return (
-      <div>
-      <Searchbar onSubmit={this.handleSearchSubmit} />
-      <ImageGallery images={images} onOpenModal={this.handleOpenModal} />
+      <div className="App">
+        <Searchbar onSubmit={this.handleSearchSubmit} />
+        <ImageGallery images={images} onOpenModal={this.handleOpenModal} />
+        {isLoading && <Loader />}
+        {images.length > 0 && <Button onClick={this.handleLoadMore} />}
+        {showModal && (
+          <Modal
+            largeImageURL={modalImageURL}
+            onCloseModal={this.handleCloseModal}
+          />
+        )}
       </div>
-    )
+    );
+  }
+}
 
-}
-}
+export default App;
