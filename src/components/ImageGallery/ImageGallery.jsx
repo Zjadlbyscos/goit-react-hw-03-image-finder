@@ -3,9 +3,9 @@ import { ImageGalleryItem } from "components/ImageGalleryItem/ImageGalleryItem";
 export const ImageGallery = ({ images, onOpenModal }) => {
     return (
       <ul className="gallery">
-        {images.map((image) => (
+        {images.map((image, index) => (
           <ImageGalleryItem
-            key={image.id}
+          key={`${image.id}_${index}`}
             {...image}
             onOpenModal={onOpenModal}
           />
