@@ -17,7 +17,7 @@ The project is a simple application for searching and browsing images using the 
 
 
 
-![App look]()
+![App look](./assets/readme.proj.view.png)
 
 
 
