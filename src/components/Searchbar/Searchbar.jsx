@@ -36,11 +36,11 @@ class Searchbar extends Component {
     query: '',
   };
 
-  handleChange = (e) => {
+  handleChange = e => {
     this.setState({ query: e.target.value });
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
     this.props.onSubmit(this.state.query);
   };
@@ -65,7 +65,6 @@ class Searchbar extends Component {
 }
 
 export default Searchbar;
-
 
 // export default class Searchbar extends Component{
 // state={

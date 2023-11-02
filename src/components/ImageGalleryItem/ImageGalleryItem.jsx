@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
-
 const GalleryItem = styled.li`
-  width: calc(25vw - 16px); /* 25% szerokości ekranu - 16px odstępu między obrazami */
+  width: calc(
+    25vw - 16px
+  ); /* 25% szerokości ekranu - 16px odstępu między obrazami */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -14,9 +15,17 @@ const GalleryImage = styled.img`
   display: block;
 `;
 
-export const ImageGalleryItem = ({ id, webformatURL, largeImageURL, onOpenModal }) => {
+export const ImageGalleryItem = ({
+  id,
+  webformatURL,
+  largeImageURL,
+  onOpenModal,
+}) => {
   return (
-    <GalleryItem className="gallery-item" onClick={() => onOpenModal(largeImageURL)}>
+    <GalleryItem
+      className="gallery-item"
+      onClick={() => onOpenModal(largeImageURL)}
+    >
       <GalleryImage src={webformatURL} alt={`${id}`} />
     </GalleryItem>
   );

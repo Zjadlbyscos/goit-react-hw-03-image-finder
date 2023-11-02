@@ -2,17 +2,16 @@ import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import styled from 'styled-components';
 
 const GalleryList = styled.ul`
-list-style: none;
-padding: 0;
-margin: 0;
-display: flex;
-flex-direction: row;
-gap: 1vw;
-flex-wrap: wrap;
-align-items: stretch;
-align-content: space-between;
-justify-content: center;
-
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1vw;
+  flex-wrap: wrap;
+  align-items: stretch;
+  align-content: space-between;
+  justify-content: center;
 `;
 
 export const ImageGallery = ({ images, onOpenModal }) => {
