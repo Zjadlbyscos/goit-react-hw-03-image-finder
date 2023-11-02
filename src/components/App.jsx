@@ -7,8 +7,6 @@ import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 
-
-
 class App extends Component {
   state = {
     query: '',
@@ -24,6 +22,7 @@ class App extends Component {
 
   componentDidMount() {
     this.fetchImages();
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -36,7 +35,7 @@ class App extends Component {
 
   componentWillUnmount() {
     // Cleanup or additional actions before unmounting
-    // Not needed in this example
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
   fetchImages = async () => {
@@ -56,7 +55,7 @@ class App extends Component {
         },
       });
 
-      this.setState((prevState) => ({
+      this.setState(prevState => ({
         images: [...prevState.images, ...response.data.hits],
         page: prevState.page + 1,
       }));
@@ -67,7 +66,7 @@ class App extends Component {
     }
   };
 
-  handleSearchSubmit = (query) => {
+  handleSearchSubmit = query => {
     this.setState({ query });
   };
 
@@ -75,14 +74,18 @@ class App extends Component {
     this.fetchImages();
   };
 
-  handleOpenModal = (largeImageURL) => {
+  handleOpenModal = largeImageURL => {
     this.setState({ showModal: true, modalImageURL: largeImageURL });
   };
 
   handleCloseModal = () => {
     this.setState({ showModal: false, modalImageURL: '' });
   };
-
+  handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      this.handleCloseModal();
+    }
+  };
   render() {
     const { images, isLoading, showModal, modalImageURL } = this.state;
 
