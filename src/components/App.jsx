@@ -7,83 +7,95 @@ import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 
-const apiKey = '39267402-49695b078cc30e5676dab55fe';
-const apiUrl = 'https://pixabay.com/api/';
-
- const App = () => {
-  const [images, setImages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [ setError] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+const App = () => {
   const [query, setQuery] = useState('');
-  const [hasMore, setHasMore] = useState(true);
-  const [largeImageUrl, setLargeImageUrl] = useState(null);
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalImageURL, setModalImageURL] = useState('');
 
+  const apiKey = '39267402-49695b078cc30e5676dab55fe';
+  const apiUrl = 'https://pixabay.com/api/';
 
-  const getImages = async (query, page) => {
+  const fetchImages = async () => {
     setIsLoading(true);
-
     try {
-      const response = await axios.get( apiUrl, {
+      const response = await axios.get(apiUrl, {
         params: {
-          q: query,
-          page: page,
           key: apiKey,
+          q: query,
+          page,
+          per_page: 12,
           image_type: 'photo',
           orientation: 'horizontal',
-          per_page: 12,
         },
       });
+
       setImages(prevImages => [...prevImages, ...response.data.hits]);
-      setIsLoading(false);
-      setHasMore(response.data.hits.length > 0);
+      setPage(prevPage => prevPage + 1);
     } catch (error) {
+      console.error('Error fetching images:', error);
+    } finally {
       setIsLoading(false);
-      setError('Error fetching images');
     }
   };
-
-  const handleSubmit = inputValue => {
-    setQuery(inputValue);
-    setCurrentPage(1);
-    setImages([]);
-  };
-
-  const loadMoreImages = () => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-  };
-
-  const openModal = largeImageUrl => {
-    setLargeImageUrl(largeImageUrl);
-  };
-
-  const closeModal = () => {
-    setLargeImageUrl(null);
-  };
-
-  // useEffect(() => {
-  //   getImages('flower', 1);
-  // }, []);
 
   useEffect(() => {
     if (query) {
-      getImages(query, currentPage);
+      fetchImages(query);
     }
-  }, [query, currentPage]);
+    // eslint-disable-next-line
+  }, [query]);
 
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
 
-return (
-  <div className="App">
-<Searchbar onSubmit={handleSubmit} />
-      <ImageGallery images={images} onImageClick={openModal} />
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+    // eslint-disable-next-line 
+  }, []);
+
+  const handleSearchSubmit = newQuery => {
+    setQuery(newQuery);
+  };
+
+  const handleLoadMore = () => {
+    fetchImages();
+  };
+
+  const handleOpenModal = largeImageURL => {
+    setModalImageURL(largeImageURL);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalImageURL('');
+    setShowModal(false);
+  };
+
+  const handleKeyDown = e => {
+    if (e.key === 'Escape') {
+      handleCloseModal();
+    }
+  };
+
+  return (
+    <div className="App">
+      <Searchbar onSubmit={handleSearchSubmit} />
       {isLoading && <Loader />}
-      <Button onClick={loadMoreImages} hasMore={hasMore} />
-      {largeImageUrl && (
-        <Modal largeImageUrl={largeImageUrl} onClose={closeModal} />
+      {images.length > 0 && (
+        <>
+          <ImageGallery images={images} onOpenModal={handleOpenModal} />
+          <Button onClick={handleLoadMore} />
+        </>
       )}
-  </div>
-);
+      {showModal && (
+        <Modal largeImageURL={modalImageURL} onCloseModal={handleCloseModal} />
+      )}
+    </div>
+  );
 };
 
 export default App;
