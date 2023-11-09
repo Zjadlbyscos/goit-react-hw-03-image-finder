@@ -4,15 +4,16 @@ import styled from 'styled-components';
 const Form = styled.form`
   display: flex;
   align-items: center;
-  max-width: 400px;
+  max-width: 700px;
   margin: 2vw auto;
   gap: 1vw;
+  
 `;
 
 const Button = styled.button`
   background-color: #007acc;
   color: #fff;
-  font-size: 1rem;
+  font-size: 2rem;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -29,6 +30,7 @@ const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-right: 10px;
+  font-size: 2rem;
 `;
 
 class Searchbar extends Component {
