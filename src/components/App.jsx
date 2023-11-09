@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import Searchbar from './Searchbar/Searchbar';
@@ -7,46 +7,25 @@ import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 
-class App extends Component {
-  state = {
-    query: '',
-    images: [],
-    page: 1,
-    isLoading: false,
-    showModal: false,
-    modalImageURL: '',
-  };
+const App= () => {
 
-  apiKey = '39267402-49695b078cc30e5676dab55fe';
-  apiUrl = 'https://pixabay.com/api/';
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([])
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalImageURL, setModalImageURL] = useState('');
 
-  componentDidMount() {
-    this.fetchImages();
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.query !== this.state.query) {
-      this.setState({ images: [], page: 1 }, () => {
-        this.fetchImages();
-      });
-    }
-  }
+  const apiKey = '39267402-49695b078cc30e5676dab55fe';
+  const apiUrl = 'https://pixabay.com/api/';
 
-  componentWillUnmount() {
-    // Cleanup or additional actions before unmounting
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  fetchImages = async () => {
-    this.setState({ isLoading: true });
-
-    const { query, page } = this.state;
-
+  const fetchImages = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.get(this.apiUrl, {
+      const response = await axios.get(apiUrl, {
         params: {
-          key: this.apiKey,
+          key: apiKey,
           q: query,
           page,
           per_page: 12,
@@ -55,55 +34,75 @@ class App extends Component {
         },
       });
 
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.data.hits],
-        page: prevState.page + 1,
-      }));
+      setImages((prevImages) => [...prevImages, ...response.data.hits]);
+      setPage((prevPage) => prevPage + 1);
     } catch (error) {
       console.error('Error fetching images:', error);
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  handleSearchSubmit = query => {
-    this.setState({ query });
-  };
+useEffect(()=>{
 
-  handleLoadMore = () => {
-    this.fetchImages();
-  };
 
-  handleOpenModal = largeImageURL => {
-    this.setState({ showModal: true, modalImageURL: largeImageURL });
-  };
-
-  handleCloseModal = () => {
-    this.setState({ showModal: false, modalImageURL: '' });
-  };
-  handleKeyDown = e => {
-    if (e.key === 'Escape') {
-      this.handleCloseModal();
-    }
-  };
-  render() {
-    const { images, isLoading, showModal, modalImageURL } = this.state;
-
-    return (
-      <div className="App">
-        <Searchbar onSubmit={this.handleSearchSubmit} />
-        <ImageGallery images={images} onOpenModal={this.handleOpenModal} />
-        {isLoading && <Loader />}
-        {images.length > 0 && <Button onClick={this.handleLoadMore} />}
-        {showModal && (
-          <Modal
-            largeImageURL={modalImageURL}
-            onCloseModal={this.handleCloseModal}
-          />
-        )}
-      </div>
-    );
+  if (query) {
+    fetchImages();
   }
-}
+},[query]);
+  
+
+useEffect(() => {
+  window.addEventListener('keydown', handleKeyDown);
+
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, []);
+
+const handleSearchSubmit = (newQuery) => {
+  setQuery(newQuery);
+};
+
+const handleLoadMore = () => {
+  fetchImages();
+};
+
+const handleOpenModal = (largeImageURL) => {
+  setModalImageURL(largeImageURL);
+  setShowModal(true);
+};
+
+const handleCloseModal = () => {
+  setModalImageURL('');
+  setShowModal(false);
+};
+
+const handleKeyDown = (e) => {
+  if (e.key === 'Escape') {
+    handleCloseModal();
+  }
+};
+
+return (
+  <div className="App">
+    <Searchbar onSubmit={handleSearchSubmit} />
+    {isLoading && <Loader />}
+    {images.length > 0 && (
+      <>
+        <ImageGallery images={images} onOpenModal={handleOpenModal} />
+        <Button onClick={handleLoadMore} />
+      </>
+    )}
+    {showModal && (
+      <Modal
+        largeImageURL={modalImageURL}
+        onCloseModal={handleCloseModal}
+      />
+    )}
+  </div>
+);
+};
 
 export default App;
+  
